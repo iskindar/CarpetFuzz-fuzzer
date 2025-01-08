@@ -592,8 +592,12 @@ u8 fuzz_one_original(afl_state_t *afl) {
              (afl->queue_cur->depth * 30 <= afl->havoc_max_mult * 100
                   ? afl->queue_cur->depth * 30
                   : afl->havoc_max_mult * 100))) {
-
-    goto custom_mutator_stage;
+    if (likely(afl->dict_only)){
+      afl->no_arith = 1;
+    }
+    else{
+      goto custom_mutator_stage;
+    }
 
   }
 
@@ -926,6 +930,7 @@ u8 fuzz_one_original(afl_state_t *afl) {
   /* Two walking bytes. */
 
   if (len < 2) { goto skip_bitflip; }
+  if (afl->dict_only) { goto skip_bitflip; }
 
   afl->stage_name = "bitflip 16/8";
   afl->stage_short = "flip16";
@@ -967,7 +972,7 @@ u8 fuzz_one_original(afl_state_t *afl) {
   afl->stage_cycles[STAGE_FLIP16] += afl->stage_max;
 
   if (len < 4) { goto skip_bitflip; }
-
+  if (afl->dict_only) { goto skip_bitflip; }
   /* Four walking bytes. */
 
   afl->stage_name = "bitflip 32/8";
@@ -1365,7 +1370,7 @@ skip_arith:
   /**********************
    * INTERESTING VALUES *
    **********************/
-
+  if (afl->dict_only) { goto skip_interest; }
   afl->stage_name = "interest 8/8";
   afl->stage_short = "int8";
   afl->stage_cur = 0;
