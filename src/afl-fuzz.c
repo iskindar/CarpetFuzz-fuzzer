@@ -897,6 +897,7 @@ int main(int argc, char **argv_orig, char **envp) {
       case 'D':                                    /* enforce deterministic */
 
         afl->skip_deterministic = 0;
+        afl->dict_only = 1;
         break;
 
       case 'd':                                       /* skip deterministic */
